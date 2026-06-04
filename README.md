@@ -1,16 +1,16 @@
 # StreamCursor
 
-Cursor overlay para Linux que resolve o problema do cursor nao aparecer ao compartilhar tela no Discord, OBS, Google Meet, Zoom e Teams.
+Custom cursor overlay for Linux that fixes the invisible cursor problem when screen sharing on Discord, OBS, Google Meet, Zoom and Teams. Renders a neon SVG cursor on a transparent fullscreen window that gets captured by any screen sharing tool.
 
-## Como funciona
+## How it works
 
-O app cria uma janela transparente fullscreen always-on-top que desenha um cursor SVG customizado na posicao real do mouse. Como e uma janela normal do sistema, ferramentas de screen share capturam ela junto com o resto da tela.
+The app creates a transparent, fullscreen, always-on-top window and draws a custom SVG cursor at the real mouse position in real time. Since it's a regular system window, screen sharing tools capture it along with the rest of the screen. The native system cursor is hidden while the overlay is active.
 
-## Requisitos
+## Requirements
 
 - Node.js 18+
-- Linux com X11 (Ubuntu 20.04+, Mint, Fedora, Arch)
-- Bibliotecas: `libx11-dev`, `libxfixes-dev`
+- Linux with X11 (Ubuntu 20.04+, Mint, Fedora, Arch)
+- Libraries: `libx11-dev`, `libxfixes-dev`
 
 ```bash
 # Ubuntu/Mint/Debian
@@ -23,77 +23,77 @@ sudo dnf install libX11-devel libXfixes-devel
 sudo pacman -S libx11 libxfixes
 ```
 
-## Instalacao
+## Installation
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Luan-oliveira8/stream-cursor.git
 cd stream-cursor
 npm install
 npx node-gyp configure build
 ```
 
-## Uso
+## Usage
 
 ```bash
-# Desenvolvimento (com hot-reload)
+# Development (with hot-reload)
 npm run dev
 
-# Build para producao
+# Production build
 npm run build
 
-# Executar build
+# Run production build
 npx electron out/main/index.js
 ```
 
-## Atalhos
+## Shortcuts
 
-| Atalho | Acao |
+| Shortcut | Action |
 |---|---|
-| `Ctrl+Shift+C` | Liga/desliga overlay |
-| Tray > Configuracoes | Abre painel de settings |
-| Tray > Sair | Fecha o app |
+| `Ctrl+Shift+C` | Toggle overlay on/off |
+| Tray icon click | Open/close settings |
+| Tray > right-click | Menu with options |
 
-## Configuracoes
+## Settings
 
-Acesse pelo icone na bandeja do sistema (system tray):
+Access via the system tray icon:
 
-- **Estilo**: Neon (verde brilhante), Classico (branco), Minimal (vermelho)
-- **Cores**: Cor primaria e contorno personalizaveis
-- **Glow**: Efeito neon com raio ajustavel
-- **Tamanho**: 0.5x ate 3x (32px a 96px)
-- **Hotkey**: Atalho customizavel
-- **Autostart**: Iniciar com o sistema
+- **Style**: Neon (green glow), Classic (white), Minimal (red)
+- **Colors**: Customizable primary and stroke colors
+- **Glow**: Neon glow effect with adjustable radius
+- **Size**: 0.5x to 3x (32px to 96px)
+- **Hotkey**: Customizable keyboard shortcut
+- **Autostart**: Launch on system startup
 
-## Build dos instaladores
+## Building installers
 
 ```bash
-# Todos os formatos Linux
+# All Linux formats
 npm run dist:linux
 
 # Windows
 npm run dist:win
 ```
 
-Gera: `.AppImage`, `.deb`, `.rpm`, `.exe`
+Generates: `.AppImage`, `.deb`, `.rpm`, `.exe`
 
-## Restaurar cursor
+## Restore cursor
 
-Se o app fechar inesperadamente com o cursor escondido:
+If the app closes unexpectedly while the cursor is hidden:
 
 ```bash
 bash scripts/restore-cursor.sh
 ```
 
-## Arquitetura
+## Architecture
 
 ```
 src/
   main/          - Electron main process (tray, overlay, tracking)
-  native/        - Addon C/N-API (XQueryPointer, XFixes)
-  preload/       - Context bridge (IPC seguro)
+  native/        - C N-API addon (XQueryPointer, XFixes, XRaiseWindow)
+  preload/       - Context bridge (secure IPC)
   renderer/
-    overlay/     - Canvas que desenha o cursor (transparente)
-    settings/    - UI de configuracoes (Svelte 5)
+    overlay/     - Canvas cursor rendering (transparent window)
+    settings/    - Settings UI (Svelte 5)
 ```
 
 ## Stack
@@ -101,6 +101,10 @@ src/
 - Electron 33 + electron-vite
 - TypeScript
 - Svelte 5 (settings UI)
-- Native N-API addon em C (X11/XFixes)
-- Canvas 2D (rendering 60fps+)
-- electron-store (persistencia)
+- Native N-API addon in C (X11/XFixes)
+- Canvas 2D (60fps+ rendering)
+- electron-store (config persistence)
+
+## License
+
+MIT
