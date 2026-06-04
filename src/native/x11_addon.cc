@@ -73,16 +73,98 @@ Napi::Object QueryPointer(const Napi::CallbackInfo& info) {
   return result;
 }
 
+static unsigned long last_checked_serial = 0;
+static std::string cached_cursor_name = "left_ptr";
+
+static std::string identify_cursor_by_image(XFixesCursorImage* img) {
+  if (!img || img->width == 0 || img->height == 0)
+    return "left_ptr";
+
+  unsigned int w = img->width;
+  unsigned int h = img->height;
+  unsigned int hx = img->xhot;
+  unsigned int hy = img->yhot;
+
+  float ratio = (float)w / (float)h;
+  bool hotspot_center = (hx > w/3 && hx < w*2/3 && hy > h/3 && hy < h*2/3);
+  bool hotspot_topleft = (hx < w/3 && hy < h/3);
+
+  // Count non-transparent pixels and their distribution
+  int total_pixels = 0;
+  int left_pixels = 0, right_pixels = 0, top_pixels = 0, bottom_pixels = 0;
+  for (unsigned int y = 0; y < h; y++) {
+    for (unsigned int x = 0; x < w; x++) {
+      unsigned long pixel = img->pixels[y * w + x];
+      unsigned int alpha = (pixel >> 24) & 0xFF;
+      if (alpha > 128) {
+        total_pixels++;
+        if (x < w/2) left_pixels++; else right_pixels++;
+        if (y < h/2) top_pixels++; else bottom_pixels++;
+      }
+    }
+  }
+
+  if (total_pixels < 5) return "left_ptr";
+
+  float fill = (float)total_pixels / (float)(w * h);
+  float h_balance = (right_pixels > 0) ? (float)left_pixels / right_pixels : 10.0f;
+  float v_balance = (bottom_pixels > 0) ? (float)top_pixels / bottom_pixels : 10.0f;
+
+  // I-beam / text cursor: tall, thin, vertically symmetric, center hotspot
+  if (ratio < 0.6f && hotspot_center && fill < 0.15f) {
+    return "xterm";
+  }
+
+  // Crosshair: roughly square, center hotspot, low fill
+  if (ratio > 0.8f && ratio < 1.2f && hotspot_center && fill < 0.12f) {
+    return "crosshair";
+  }
+
+  // Hand / pointer: hotspot near top, wider shape
+  if (hy < h/3 && fill > 0.15f && fill < 0.6f && h_balance > 0.5f && h_balance < 2.0f) {
+    // If hotspot is top-center-ish, likely a hand
+    if (hx > w/4 && hx < w*3/4) {
+      return "hand2";
+    }
+  }
+
+  // Move cursor: roughly square, center hotspot, moderate fill, balanced
+  if (ratio > 0.8f && ratio < 1.2f && hotspot_center && fill > 0.08f && fill < 0.4f
+      && h_balance > 0.6f && h_balance < 1.5f && v_balance > 0.6f && v_balance < 1.5f) {
+    return "fleur";
+  }
+
+  // Vertical resize: taller than wide, center hotspot
+  if (ratio < 0.7f && hotspot_center && fill > 0.1f) {
+    return "ns-resize";
+  }
+
+  // Horizontal resize: wider than tall, center hotspot
+  if (ratio > 1.4f && hotspot_center && fill > 0.1f) {
+    return "ew-resize";
+  }
+
+  // Not-allowed: roughly square, center hotspot, ring-like (moderate fill)
+  if (ratio > 0.8f && ratio < 1.2f && hotspot_center && fill > 0.1f && fill < 0.35f) {
+    return "crossed_circle";
+  }
+
+  // Default: arrow pointer with top-left hotspot
+  if (hotspot_topleft) {
+    return "left_ptr";
+  }
+
+  return "left_ptr";
+}
+
 Napi::Value GetCursorState(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   if (!display) {
-    return Napi::String::New(env, "arrow");
+    return Napi::String::New(env, "left_ptr");
   }
 
   XEvent event;
-  std::string cursor_name = "";
-
   while (XPending(display)) {
     XNextEvent(display, &event);
     if (event.type == xfixes_event_base + XFixesCursorNotify) {
@@ -92,17 +174,22 @@ Napi::Value GetCursorState(const Napi::CallbackInfo& info) {
   }
 
   XFixesCursorImage* cursor_image = XFixesGetCursorImage(display);
-  if (cursor_image) {
-    if (cursor_image->name && strlen(cursor_image->name) > 0) {
-      cursor_name = cursor_image->name;
-    }
-    XFree(cursor_image);
+  if (!cursor_image) {
+    return Napi::String::New(env, cached_cursor_name);
   }
 
-  if (cursor_name.empty()) {
-    return Napi::String::New(env, "left_ptr");
+  std::string cursor_name = "";
+  if (cursor_image->name && strlen(cursor_image->name) > 0) {
+    cursor_name = cursor_image->name;
   }
 
+  // If name is generic (left_ptr) or empty, try to identify by image shape
+  if (cursor_name.empty() || cursor_name == "left_ptr" || cursor_name == "default") {
+    cursor_name = identify_cursor_by_image(cursor_image);
+  }
+
+  XFree(cursor_image);
+  cached_cursor_name = cursor_name;
   return Napi::String::New(env, cursor_name);
 }
 

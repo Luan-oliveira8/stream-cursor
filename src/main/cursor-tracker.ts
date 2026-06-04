@@ -45,8 +45,59 @@ function registerOverlayWindow(): void {
   } catch {}
 }
 
+const EXTRA_ALIASES: Record<string, string> = {
+  'n-resize': 'ns-resize',
+  's-resize': 'ns-resize',
+  'top_side': 'ns-resize',
+  'bottom_side': 'ns-resize',
+  'e-resize': 'ew-resize',
+  'w-resize': 'ew-resize',
+  'left_side': 'ew-resize',
+  'right_side': 'ew-resize',
+  'nw-resize': 'nwse-resize',
+  'se-resize': 'nwse-resize',
+  'ne-resize': 'nesw-resize',
+  'sw-resize': 'nesw-resize',
+  'hand1': 'hand',
+  'hand2': 'hand',
+  'pointing_hand': 'hand',
+  'left_ptr': 'pointer',
+  'default': 'pointer',
+  'arrow': 'pointer',
+  'top_left_arrow': 'pointer',
+  'xterm': 'text',
+  'ibeam': 'text',
+  'watch': 'wait',
+  'left_ptr_watch': 'progress',
+  'half-busy': 'progress',
+  'fleur': 'move',
+  'size_all': 'all-scroll',
+  'cross': 'crosshair',
+  'tcross': 'crosshair',
+  'crossed_circle': 'not-allowed',
+  'forbidden': 'not-allowed',
+  'question_arrow': 'help',
+  'whats_this': 'help',
+  'openhand': 'grab',
+  'closedhand': 'grabbing',
+  'dnd-move': 'grabbing',
+  'dnd-copy': 'copy',
+  'dnd-link': 'alias',
+  'size_ver': 'ns-resize',
+  'size_hor': 'ew-resize',
+  'size_fdiag': 'nwse-resize',
+  'size_bdiag': 'nesw-resize',
+  'v_double_arrow': 'ns-resize',
+  'h_double_arrow': 'ew-resize',
+  'split_h': 'col-resize',
+  'split_v': 'row-resize',
+  'plus': 'cell',
+  'sb_v_double_arrow': 'ns-resize',
+  'sb_h_double_arrow': 'ew-resize',
+}
+
 export function setXcursorMap(map: Record<string, string>): void {
-  xcursorMap = map
+  xcursorMap = { ...EXTRA_ALIASES, ...map }
 }
 
 export function startTracking(): void {
@@ -58,6 +109,7 @@ export function startTracking(): void {
   }
 
   overlayRegistered = false
+  let stateCounter = 0
 
   pollTimer = setInterval(() => {
     try {
@@ -68,11 +120,15 @@ export function startTracking(): void {
 
       x11Addon.raiseOverlay()
 
-      const rawState = x11Addon.getCursorState()
-      const mappedState = xcursorMap[rawState] || 'pointer'
-      if (mappedState !== lastState) {
-        lastState = mappedState
-        sendToOverlay('cursor:state', { state: mappedState })
+      stateCounter++
+      if (stateCounter >= 12) {
+        stateCounter = 0
+        const rawState = x11Addon.getCursorState()
+        const mappedState = xcursorMap[rawState] || 'pointer'
+        if (mappedState !== lastState) {
+          lastState = mappedState
+          sendToOverlay('cursor:state', { state: mappedState })
+        }
       }
     } catch (e) {
       log.error('Tracking error:', e)
