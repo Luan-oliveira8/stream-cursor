@@ -1,0 +1,40 @@
+{
+  "name": "stream-cursor",
+  "version": "1.0.0",
+  "description": "Cursor overlay for screen sharing - makes your cursor visible on Discord, OBS, Meet, Zoom, Teams",
+  "main": "./out/main/index.js",
+  "author": {
+    "name": "Luan Oliveira",
+    "email": "luanfones@gmail.com"
+  },
+  "homepage": "https://github.com/Luan-oliveira8/stream-cursor",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "postinstall": "electron-rebuild",
+    "rebuild-native": "node-gyp rebuild --directory=src/native",
+    "dist": "electron-vite build && electron-builder",
+    "dist:linux": "electron-vite build && electron-builder --linux",
+    "dist:win": "electron-vite build && electron-builder --win"
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron-log": "^5.4.0",
+    "electron-store": "^8.2.0",
+    "node-addon-api": "^8.3.1"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.1",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "node-gyp": "^10.3.1",
+    "svelte": "^5.16.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.0"
+  }
+}

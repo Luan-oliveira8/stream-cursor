@@ -1,0 +1,49 @@
+appId: com.streamcursor.app
+productName: StreamCursor
+directories:
+  buildResources: build
+  output: dist
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+    - target: rpm
+      arch: [x64]
+  category: Utility
+  icon: build/icons
+  synopsis: Visible cursor overlay for screen sharing
+  description: |
+    StreamCursor renders a custom cursor overlay that is captured by
+    screen sharing tools like Discord, OBS, Google Meet, Zoom, and Teams.
+
+deb:
+  depends:
+    - libx11-6
+    - libxfixes3
+    - libxi6
+
+appImage:
+  artifactName: StreamCursor-${version}.AppImage
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.ico
+
+nsis:
+  oneClick: true
+  allowToChangeInstallationDirectory: false
+
+extraResources:
+  - from: build/Release/
+    to: native/
+    filter:
+      - "*.node"
+
+files:
+  - "out/**/*"
+  - "resources/**/*"

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "outDir": "./out",
+    "resolveJsonModule": true,
+    "types": ["svelte"]
+  },
+  "include": [
+    "src/renderer/**/*"
+  ]
+}
