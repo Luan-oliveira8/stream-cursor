@@ -80,6 +80,25 @@ export function isOverlayActive(): boolean {
   return overlayActive
 }
 
+function registerHotkeyWithRetry(hotkey: string, callback: () => void, maxAttempts = 10): void {
+  let attempt = 0
+  const tryRegister = (): void => {
+    attempt++
+    const success = globalShortcut.register(hotkey, callback)
+    if (success) {
+      log.info(`Global shortcut ${hotkey} registered (attempt ${attempt})`)
+      return
+    }
+    if (attempt < maxAttempts) {
+      log.warn(`Failed to register shortcut ${hotkey}, retrying in 2s (attempt ${attempt}/${maxAttempts})`)
+      setTimeout(tryRegister, 2000)
+    } else {
+      log.error(`Failed to register shortcut ${hotkey} after ${maxAttempts} attempts`)
+    }
+  }
+  tryRegister()
+}
+
 function cleanup(): void {
   stopTracking()
   showCursor()
@@ -98,7 +117,7 @@ app.whenReady().then(() => {
 
   const config = getConfig()
   const hotkey = config.get('toggleHotkey') as string || 'Control+Shift+K'
-  globalShortcut.register(hotkey, toggleOverlay)
+  registerHotkeyWithRetry(hotkey, toggleOverlay)
 
   if (!startHidden) {
     createSettingsWindow()
