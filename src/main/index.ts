@@ -90,16 +90,19 @@ function cleanup(): void {
 app.whenReady().then(() => {
   if (!gotTheLock) return
 
-  log.info('StreamCursor starting...')
+  const startHidden = process.argv.includes('--hidden')
+  log.info(`StreamCursor starting...${startHidden ? ' (hidden)' : ''}`)
 
   registerIpcHandlers()
   createTray()
 
   const config = getConfig()
-  const hotkey = config.get('toggleHotkey') as string || 'CommandOrControl+Shift+C'
+  const hotkey = config.get('toggleHotkey') as string || 'Control+Shift+K'
   globalShortcut.register(hotkey, toggleOverlay)
 
-  createSettingsWindow()
+  if (!startHidden) {
+    createSettingsWindow()
+  }
   toggleOverlay()
 
   log.info('StreamCursor ready')
