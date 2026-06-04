@@ -4,8 +4,9 @@ import path from 'path'
 
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let x11Addon: any = null
-let lastState = 'arrow'
+let lastState = ''
 let overlayRegistered = false
+let xcursorMap: Record<string, string> = {}
 
 function loadAddon(): boolean {
   if (x11Addon) return true
@@ -40,11 +41,12 @@ function registerOverlayWindow(): void {
       const xid = handle.readUInt32LE(0)
       x11Addon.setOverlayWindow(xid)
       overlayRegistered = true
-      log.info('Overlay window registered for XRaiseWindow')
     }
-  } catch (e) {
-    log.warn('Could not register overlay window:', e)
-  }
+  } catch {}
+}
+
+export function setXcursorMap(map: Record<string, string>): void {
+  xcursorMap = map
 }
 
 export function startTracking(): void {
@@ -66,10 +68,11 @@ export function startTracking(): void {
 
       x11Addon.raiseOverlay()
 
-      const state = x11Addon.getCursorState()
-      if (state !== lastState) {
-        lastState = state
-        sendToOverlay('cursor:state', { state })
+      const rawState = x11Addon.getCursorState()
+      const mappedState = xcursorMap[rawState] || 'pointer'
+      if (mappedState !== lastState) {
+        lastState = mappedState
+        sendToOverlay('cursor:state', { state: mappedState })
       }
     } catch (e) {
       log.error('Tracking error:', e)

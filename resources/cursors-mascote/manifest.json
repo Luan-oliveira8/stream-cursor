@@ -1,0 +1,21 @@
+{
+  "note": "Cursor branco + mascote chibi original ao lado. 24 formas por mascote.",
+  "mascots": [
+    {
+      "id": "neko",
+      "name": "Neko (gatinha)"
+    },
+    {
+      "id": "star",
+      "name": "Star (estrelinha)"
+    },
+    {
+      "id": "slime",
+      "name": "Slime"
+    },
+    {
+      "id": "fox",
+      "name": "Fox (raposinha)"
+    }
+  ]
+}

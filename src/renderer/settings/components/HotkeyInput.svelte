@@ -14,7 +14,7 @@
 
   function startListening() {
     listening = true
-    displayValue = 'Pressione uma combinação...'
+    displayValue = 'Press a key combination...'
   }
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -49,9 +49,9 @@
   <div class="hotkey-display" class:listening>
     <span class="keys">{displayValue}</span>
     {#if listening}
-      <button class="cancel-btn" onclick={cancel}>Cancelar</button>
+      <button class="cancel-btn" onclick={cancel}>Cancel</button>
     {:else}
-      <button class="change-btn" onclick={startListening}>Alterar</button>
+      <button class="change-btn" onclick={startListening}>Change</button>
     {/if}
   </div>
   {#if listening}
@@ -63,7 +63,7 @@
       onblur={cancel}
     />
   {/if}
-  <p class="hint">Clique em "Alterar" e pressione a nova combinação de teclas</p>
+  <p class="hint">Click "Change" and press the new key combination</p>
 </div>
 
 <style>

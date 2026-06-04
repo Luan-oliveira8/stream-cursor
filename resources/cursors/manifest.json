@@ -1,0 +1,378 @@
+{
+  "viewBox": 32,
+  "exportSize": 48,
+  "styles": [
+    {
+      "id": "01-windows-white",
+      "name": "Windows Default"
+    },
+    {
+      "id": "02-mint-white",
+      "name": "Linux Mint Default"
+    },
+    {
+      "id": "03-black",
+      "name": "Preto"
+    },
+    {
+      "id": "04-hi-yellow",
+      "name": "Amarelo alto-contraste"
+    },
+    {
+      "id": "05-neon-green",
+      "name": "Verde neon"
+    },
+    {
+      "id": "06-cyan-glow",
+      "name": "Ciano"
+    },
+    {
+      "id": "07-magenta-glow",
+      "name": "Magenta"
+    },
+    {
+      "id": "08-red",
+      "name": "Vermelho"
+    },
+    {
+      "id": "09-orange",
+      "name": "Laranja"
+    },
+    {
+      "id": "10-electric-blue",
+      "name": "Azul elétrico"
+    },
+    {
+      "id": "11-purple",
+      "name": "Roxo"
+    },
+    {
+      "id": "12-white-halo",
+      "name": "Branco com halo"
+    },
+    {
+      "id": "13-contrast-yellow",
+      "name": "Preto + contorno amarelo"
+    },
+    {
+      "id": "14-bold-white",
+      "name": "Branco grosso"
+    },
+    {
+      "id": "15-sunset",
+      "name": "Pôr do sol"
+    },
+    {
+      "id": "16-ocean",
+      "name": "Oceano"
+    },
+    {
+      "id": "17-hollow",
+      "name": "Contorno"
+    },
+    {
+      "id": "18-shadow-white",
+      "name": "Branco com sombra"
+    },
+    {
+      "id": "19-teal",
+      "name": "Verde-azulado"
+    },
+    {
+      "id": "20-gold",
+      "name": "Ouro"
+    },
+    {
+      "id": "21-lime-shadow",
+      "name": "Lima"
+    },
+    {
+      "id": "22-pink-glow",
+      "name": "Rosa"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "pointer",
+      "hotspot": [
+        4,
+        3
+      ],
+      "xcursor": [
+        "left_ptr",
+        "default",
+        "arrow",
+        "top_left_arrow"
+      ]
+    },
+    {
+      "name": "hand",
+      "hotspot": [
+        11,
+        2
+      ],
+      "xcursor": [
+        "pointer",
+        "hand",
+        "hand2",
+        "pointing_hand"
+      ]
+    },
+    {
+      "name": "text",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "xterm",
+        "text",
+        "ibeam"
+      ]
+    },
+    {
+      "name": "vertical-text",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "vertical-text"
+      ]
+    },
+    {
+      "name": "move",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "fleur",
+        "move"
+      ]
+    },
+    {
+      "name": "all-scroll",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "all-scroll",
+        "size_all"
+      ]
+    },
+    {
+      "name": "ns-resize",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "ns-resize",
+        "size_ver",
+        "v_double_arrow",
+        "sb_v_double_arrow"
+      ]
+    },
+    {
+      "name": "ew-resize",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "ew-resize",
+        "size_hor",
+        "h_double_arrow",
+        "sb_h_double_arrow"
+      ]
+    },
+    {
+      "name": "nwse-resize",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "nwse-resize",
+        "size_fdiag",
+        "bottom_right_corner",
+        "top_left_corner"
+      ]
+    },
+    {
+      "name": "nesw-resize",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "nesw-resize",
+        "size_bdiag",
+        "bottom_left_corner",
+        "top_right_corner"
+      ]
+    },
+    {
+      "name": "col-resize",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "col-resize",
+        "split_h",
+        "sb_h_double_arrow"
+      ]
+    },
+    {
+      "name": "row-resize",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "row-resize",
+        "split_v",
+        "sb_v_double_arrow"
+      ]
+    },
+    {
+      "name": "crosshair",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "crosshair",
+        "cross",
+        "tcross"
+      ]
+    },
+    {
+      "name": "cell",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "cell",
+        "plus"
+      ]
+    },
+    {
+      "name": "not-allowed",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "not-allowed",
+        "crossed_circle",
+        "forbidden",
+        "no-drop"
+      ]
+    },
+    {
+      "name": "help",
+      "hotspot": [
+        4,
+        3
+      ],
+      "xcursor": [
+        "help",
+        "question_arrow",
+        "whats_this"
+      ]
+    },
+    {
+      "name": "wait",
+      "hotspot": [
+        16,
+        16
+      ],
+      "xcursor": [
+        "wait",
+        "watch"
+      ]
+    },
+    {
+      "name": "progress",
+      "hotspot": [
+        4,
+        3
+      ],
+      "xcursor": [
+        "progress",
+        "left_ptr_watch",
+        "half-busy"
+      ]
+    },
+    {
+      "name": "zoom-in",
+      "hotspot": [
+        13,
+        13
+      ],
+      "xcursor": [
+        "zoom-in"
+      ]
+    },
+    {
+      "name": "zoom-out",
+      "hotspot": [
+        13,
+        13
+      ],
+      "xcursor": [
+        "zoom-out"
+      ]
+    },
+    {
+      "name": "grab",
+      "hotspot": [
+        16,
+        12
+      ],
+      "xcursor": [
+        "grab",
+        "openhand"
+      ]
+    },
+    {
+      "name": "grabbing",
+      "hotspot": [
+        16,
+        13
+      ],
+      "xcursor": [
+        "grabbing",
+        "closedhand",
+        "dnd-move"
+      ]
+    },
+    {
+      "name": "copy",
+      "hotspot": [
+        4,
+        3
+      ],
+      "xcursor": [
+        "copy",
+        "dnd-copy"
+      ]
+    },
+    {
+      "name": "alias",
+      "hotspot": [
+        4,
+        3
+      ],
+      "xcursor": [
+        "alias",
+        "dnd-link"
+      ]
+    }
+  ]
+}

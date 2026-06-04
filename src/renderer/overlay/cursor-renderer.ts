@@ -1,27 +1,9 @@
-import { CURSOR_DEFS } from './cursor-svgs'
-
-interface CursorSettings {
-  primaryColor: string
-  strokeColor: string
-  glowEnabled: boolean
-  glowRadius: number
-  cursorSize: number
-  cursorStyle: string
-}
-
-const DEFAULT_SETTINGS: CursorSettings = {
-  primaryColor: '#00FF41',
-  strokeColor: '#003300',
-  glowEnabled: true,
-  glowRadius: 4,
-  cursorSize: 1.0,
-  cursorStyle: 'neon'
-}
-
-const STYLE_PRESETS: Record<string, Partial<CursorSettings>> = {
-  neon: { primaryColor: '#00FF41', strokeColor: '#003300', glowEnabled: true, glowRadius: 4 },
-  classic: { primaryColor: '#FFFFFF', strokeColor: '#000000', glowEnabled: false, glowRadius: 0 },
-  minimal: { primaryColor: '#FF4444', strokeColor: '#440000', glowEnabled: true, glowRadius: 2 }
+interface ShapeData {
+  svg: string
+  hotspotX: number
+  hotspotY: number
+  width: number
+  height: number
 }
 
 export class CursorRenderer {
@@ -29,9 +11,10 @@ export class CursorRenderer {
   private ctx: CanvasRenderingContext2D
   private currentPos = { x: -100, y: -100 }
   private lastDrawnPos = { x: -200, y: -200 }
-  private currentState = 'arrow'
+  private currentState = 'pointer'
   private cursorImages: Map<string, HTMLImageElement> = new Map()
-  private settings: CursorSettings = { ...DEFAULT_SETTINGS }
+  private shapeDefs: Map<string, ShapeData> = new Map()
+  private cursorSize = 1.0
   private animationFrame = 0
   private rotationAngle = 0
   private prevRect = { x: 0, y: 0, w: 0, h: 0 }
@@ -46,50 +29,25 @@ export class CursorRenderer {
   private resize(): void {
     this.canvas.width = window.innerWidth
     this.canvas.height = window.innerHeight
-    console.log(`[StreamCursor] Canvas resized: ${this.canvas.width}x${this.canvas.height}`)
   }
 
-  async loadCursors(settings?: Partial<CursorSettings>): Promise<void> {
-    if (settings) {
-      Object.assign(this.settings, settings)
-    }
-
-    const s = this.settings
-    const fill = s.primaryColor
-    const stroke = s.strokeColor
-    const gr = s.glowEnabled ? s.glowRadius : 0
-    const gc = s.primaryColor
-
+  async loadTheme(themeData: Record<string, ShapeData>): Promise<void> {
     this.cursorImages.clear()
+    this.shapeDefs.clear()
 
-    const entries = Object.entries(CURSOR_DEFS)
-    let loaded = 0
+    for (const [name, shape] of Object.entries(themeData)) {
+      this.shapeDefs.set(name, shape)
 
-    for (const [state, def] of entries) {
-      try {
-        const svgString = def.svg(fill, stroke, gr, gc)
-        const encoded = btoa(unescape(encodeURIComponent(svgString)))
-        const dataUrl = `data:image/svg+xml;base64,${encoded}`
-
-        const img = new Image()
-        await new Promise<void>((resolve) => {
-          img.onload = () => {
-            this.cursorImages.set(state, img)
-            loaded++
-            resolve()
-          }
-          img.onerror = (err) => {
-            console.error(`[StreamCursor] Failed to load cursor SVG: ${state}`, err)
-            resolve()
-          }
-          img.src = dataUrl
-        })
-      } catch (err) {
-        console.error(`[StreamCursor] Error creating cursor: ${state}`, err)
-      }
+      const img = new Image()
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          this.cursorImages.set(name, img)
+          resolve()
+        }
+        img.onerror = () => resolve()
+        img.src = shape.svg
+      })
     }
-
-    console.log(`[StreamCursor] Loaded ${loaded}/${entries.length} cursor images`)
   }
 
   updatePosition(x: number, y: number): void {
@@ -98,31 +56,24 @@ export class CursorRenderer {
   }
 
   updateState(state: string): void {
-    if (CURSOR_DEFS[state]) {
+    if (this.shapeDefs.has(state)) {
       this.currentState = state
     }
   }
 
-  updateSettings(settings: Partial<CursorSettings>): void {
-    const styleChanged = settings.cursorStyle && settings.cursorStyle !== this.settings.cursorStyle
-    Object.assign(this.settings, settings)
-
-    if (styleChanged && STYLE_PRESETS[this.settings.cursorStyle]) {
-      Object.assign(this.settings, STYLE_PRESETS[this.settings.cursorStyle])
-    }
-
-    this.loadCursors()
+  setCursorSize(size: number): void {
+    this.cursorSize = size
   }
 
   start(): void {
     const render = (): void => {
-      const def = CURSOR_DEFS[this.currentState]
+      const def = this.shapeDefs.get(this.currentState)
       if (!def) {
         this.animationFrame = requestAnimationFrame(render)
         return
       }
 
-      const isAnimated = def.animated
+      const isAnimated = this.currentState === 'wait' || this.currentState === 'progress'
       const moved = this.currentPos.x !== this.lastDrawnPos.x ||
                     this.currentPos.y !== this.lastDrawnPos.y
 
@@ -140,7 +91,7 @@ export class CursorRenderer {
 
       const cursor = this.cursorImages.get(this.currentState)
       if (cursor) {
-        const scale = this.settings.cursorSize
+        const scale = this.cursorSize
         const drawW = def.width * scale
         const drawH = def.height * scale
         const drawX = this.currentPos.x - def.hotspotX * scale
@@ -153,7 +104,6 @@ export class CursorRenderer {
           this.rotationAngle += 0.08
           this.ctx.drawImage(cursor, -drawW / 2, -drawH / 2, drawW, drawH)
           this.ctx.restore()
-
           this.prevRect = {
             x: this.currentPos.x - drawW,
             y: this.currentPos.y - drawH,

@@ -10,17 +10,17 @@ function rebuildMenu(): void {
 
   const menu = Menu.buildFromTemplate([
     {
-      label: isActive ? 'Desativar Overlay' : 'Ativar Overlay',
+      label: isActive ? 'Disable Overlay' : 'Enable Overlay',
       click: () => toggleOverlay()
     },
     { type: 'separator' },
     {
-      label: 'Configuracoes',
+      label: 'Settings',
       click: () => openSettings()
     },
     { type: 'separator' },
     {
-      label: 'Sair',
+      label: 'Quit',
       click: () => {
         app.exit(0)
       }
@@ -72,7 +72,7 @@ function createFallbackIcon(): Electron.NativeImage {
 export function updateTrayState(active: boolean): void {
   isActive = active
   if (tray) {
-    tray.setToolTip(active ? 'StreamCursor - Ativo' : 'StreamCursor - Inativo')
+    tray.setToolTip(active ? 'StreamCursor - Active' : 'StreamCursor - Inactive')
     rebuildMenu()
   }
 }

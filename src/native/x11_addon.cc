@@ -99,51 +99,11 @@ Napi::Value GetCursorState(const Napi::CallbackInfo& info) {
     XFree(cursor_image);
   }
 
-  if (cursor_name.empty() || cursor_name == "left_ptr" || cursor_name == "default" ||
-      cursor_name == "arrow" || cursor_name == "top_left_arrow") {
-    return Napi::String::New(env, "arrow");
-  } else if (cursor_name == "hand2" || cursor_name == "pointer" ||
-             cursor_name == "pointing_hand" || cursor_name == "hand1") {
-    return Napi::String::New(env, "pointer");
-  } else if (cursor_name == "xterm" || cursor_name == "text" || cursor_name == "ibeam") {
-    return Napi::String::New(env, "text");
-  } else if (cursor_name == "watch" || cursor_name == "wait") {
-    return Napi::String::New(env, "wait");
-  } else if (cursor_name == "left_ptr_watch" || cursor_name == "progress" ||
-             cursor_name == "half-busy") {
-    return Napi::String::New(env, "progress");
-  } else if (cursor_name == "fleur" || cursor_name == "move" ||
-             cursor_name == "grabbing" || cursor_name == "grab") {
-    return Napi::String::New(env, "move");
-  } else if (cursor_name == "crossed_circle" || cursor_name == "not-allowed" ||
-             cursor_name == "forbidden" || cursor_name == "no-drop") {
-    return Napi::String::New(env, "not-allowed");
-  } else if (cursor_name == "crosshair" || cursor_name == "cross" || cursor_name == "tcross") {
-    return Napi::String::New(env, "crosshair");
-  } else if (cursor_name == "top_side" || cursor_name == "bottom_side" ||
-             cursor_name == "n-resize" || cursor_name == "s-resize" ||
-             cursor_name == "ns-resize" || cursor_name == "sb_v_double_arrow" ||
-             cursor_name == "row-resize") {
-    return Napi::String::New(env, "resize-ns");
-  } else if (cursor_name == "left_side" || cursor_name == "right_side" ||
-             cursor_name == "e-resize" || cursor_name == "w-resize" ||
-             cursor_name == "ew-resize" || cursor_name == "sb_h_double_arrow" ||
-             cursor_name == "col-resize") {
-    return Napi::String::New(env, "resize-ew");
-  } else if (cursor_name == "top_left_corner" || cursor_name == "bottom_right_corner" ||
-             cursor_name == "nwse-resize" || cursor_name == "nw-resize" ||
-             cursor_name == "se-resize" || cursor_name == "size_fdiag") {
-    return Napi::String::New(env, "resize-nwse");
-  } else if (cursor_name == "top_right_corner" || cursor_name == "bottom_left_corner" ||
-             cursor_name == "nesw-resize" || cursor_name == "ne-resize" ||
-             cursor_name == "sw-resize" || cursor_name == "size_bdiag") {
-    return Napi::String::New(env, "resize-nesw");
-  } else if (cursor_name == "question_arrow" || cursor_name == "help" ||
-             cursor_name == "whats_this") {
-    return Napi::String::New(env, "help");
+  if (cursor_name.empty()) {
+    return Napi::String::New(env, "left_ptr");
   }
 
-  return Napi::String::New(env, "arrow");
+  return Napi::String::New(env, cursor_name);
 }
 
 Napi::Boolean HideCursor(const Napi::CallbackInfo& info) {

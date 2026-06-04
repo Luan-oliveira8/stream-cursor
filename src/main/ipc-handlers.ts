@@ -2,7 +2,8 @@ import { ipcMain, globalShortcut } from 'electron'
 import { getConfig, getAllSettings } from './config'
 import { setAutostart } from './autostart'
 import { sendToOverlay } from './overlay-window'
-import { toggleOverlay, isOverlayActive } from './index'
+import { toggleOverlay, isOverlayActive, applyTheme } from './index'
+import { getAvailableThemes } from './theme-loader'
 import log from 'electron-log'
 
 export function registerIpcHandlers(): void {
@@ -25,7 +26,10 @@ export function registerIpcHandlers(): void {
       globalShortcut.register(value as string, toggleOverlay)
     }
 
-    log.info(`Setting updated: ${key} = ${JSON.stringify(value)}`)
+    if (key === 'cursorTheme') {
+      applyTheme(value as string)
+    }
+
     return true
   })
 
@@ -36,5 +40,9 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('overlay:status', () => {
     return isOverlayActive()
+  })
+
+  ipcMain.handle('themes:list', () => {
+    return getAvailableThemes()
   })
 }

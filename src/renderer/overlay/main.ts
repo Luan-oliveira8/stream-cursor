@@ -6,6 +6,7 @@ declare global {
       onCursorMove: (callback: (pos: { x: number; y: number }) => void) => void
       onCursorState: (callback: (data: { state: string }) => void) => void
       onSettingsUpdated: (callback: (settings: any) => void) => void
+      onThemeLoaded: (callback: (theme: any) => void) => void
     }
   }
 }
@@ -15,7 +16,6 @@ async function init(): Promise<void> {
   if (!canvas) return
 
   const renderer = new CursorRenderer(canvas)
-  await renderer.loadCursors()
   renderer.start()
 
   window.streamCursor.onCursorMove((pos) => {
@@ -26,8 +26,14 @@ async function init(): Promise<void> {
     renderer.updateState(data.state)
   })
 
+  window.streamCursor.onThemeLoaded(async (themeData) => {
+    await renderer.loadTheme(themeData)
+  })
+
   window.streamCursor.onSettingsUpdated((settings) => {
-    renderer.updateSettings(settings)
+    if (settings.cursorSize) {
+      renderer.setCursorSize(settings.cursorSize)
+    }
   })
 }
 

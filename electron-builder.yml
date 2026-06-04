@@ -43,6 +43,10 @@ extraResources:
     to: native/
     filter:
       - "*.node"
+  - from: resources/cursors/
+    to: resources/cursors/
+  - from: resources/cursors-mascote/
+    to: resources/cursors-mascote/
 
 files:
   - "out/**/*"
