@@ -13,12 +13,19 @@ const defaults: StreamCursorConfig = {
   cursorTheme: '05-neon-green',
   cursorSize: 1.0,
   hideSystemCursor: true,
-  toggleHotkey: 'CommandOrControl+Shift+C',
+  toggleHotkey: 'Control+Shift+K',
   autostart: false,
   startMinimized: true
 }
 
 let store: Store<StreamCursorConfig> | null = null
+
+function migrateConfig(s: Store<StreamCursorConfig>): void {
+  const hotkey = s.get('toggleHotkey')
+  if (hotkey === 'CommandOrControl+Shift+C' || hotkey === 'Control+Shift+C') {
+    s.set('toggleHotkey', defaults.toggleHotkey)
+  }
+}
 
 export function getConfig(): Store<StreamCursorConfig> {
   if (!store) {
@@ -26,6 +33,7 @@ export function getConfig(): Store<StreamCursorConfig> {
       name: 'stream-cursor-config',
       defaults
     })
+    migrateConfig(store)
   }
   return store
 }

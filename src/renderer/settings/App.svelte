@@ -21,7 +21,7 @@
     cursorTheme: '05-neon-green',
     cursorSize: 1.0,
     hideSystemCursor: true,
-    toggleHotkey: 'CommandOrControl+Shift+C',
+    toggleHotkey: 'Control+Shift+K',
     autostart: false,
     startMinimized: true
   })

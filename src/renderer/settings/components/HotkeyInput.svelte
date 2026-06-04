@@ -22,7 +22,7 @@
     e.preventDefault()
 
     const parts: string[] = []
-    if (e.ctrlKey) parts.push('CommandOrControl')
+    if (e.ctrlKey) parts.push('Control')
     if (e.shiftKey) parts.push('Shift')
     if (e.altKey) parts.push('Alt')
 
