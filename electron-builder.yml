@@ -10,16 +10,13 @@ linux:
       arch: [x64]
     - target: deb
       arch: [x64]
-    - target: rpm
-      arch: [x64]
   category: Utility
   icon: build/icons
   synopsis: Visible cursor overlay for screen sharing
-  description: |
-    StreamCursor renders a custom cursor overlay that is captured by
-    screen sharing tools like Discord, OBS, Google Meet, Zoom, and Teams.
+  description: Visible cursor overlay for screen sharing (Discord, OBS, Meet, Zoom, Teams)
 
 deb:
+  afterInstall: scripts/postinstall.sh
   depends:
     - libx11-6
     - libxfixes3
