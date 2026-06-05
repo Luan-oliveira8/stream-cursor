@@ -92,6 +92,7 @@ static std::string identify_cursor_by_image(XFixesCursorImage* img) {
   // Count non-transparent pixels and their distribution
   int total_pixels = 0;
   int left_pixels = 0, right_pixels = 0, top_pixels = 0, bottom_pixels = 0;
+  int center_col_pixels = 0;
   for (unsigned int y = 0; y < h; y++) {
     for (unsigned int x = 0; x < w; x++) {
       unsigned long pixel = img->pixels[y * w + x];
@@ -100,6 +101,7 @@ static std::string identify_cursor_by_image(XFixesCursorImage* img) {
         total_pixels++;
         if (x < w/2) left_pixels++; else right_pixels++;
         if (y < h/2) top_pixels++; else bottom_pixels++;
+        if (x >= w/3 && x < w*2/3) center_col_pixels++;
       }
     }
   }
@@ -109,9 +111,10 @@ static std::string identify_cursor_by_image(XFixesCursorImage* img) {
   float fill = (float)total_pixels / (float)(w * h);
   float h_balance = (right_pixels > 0) ? (float)left_pixels / right_pixels : 10.0f;
   float v_balance = (bottom_pixels > 0) ? (float)top_pixels / bottom_pixels : 10.0f;
+  float center_h_ratio = (float)center_col_pixels / total_pixels;
 
-  // I-beam / text cursor: tall, thin, vertically symmetric, center hotspot
-  if (ratio < 0.6f && hotspot_center && fill < 0.15f) {
+  // I-beam / text cursor: center hotspot, low fill, pixels concentrated in center column
+  if (hotspot_center && fill < 0.25f && center_h_ratio > 0.55f) {
     return "xterm";
   }
 
@@ -144,8 +147,8 @@ static std::string identify_cursor_by_image(XFixesCursorImage* img) {
     return "ew-resize";
   }
 
-  // Not-allowed: roughly square, center hotspot, ring-like (moderate fill)
-  if (ratio > 0.8f && ratio < 1.2f && hotspot_center && fill > 0.1f && fill < 0.35f) {
+  // Not-allowed: roughly square, center hotspot, ring-like (pixels spread to edges)
+  if (ratio > 0.8f && ratio < 1.2f && hotspot_center && fill > 0.1f && fill < 0.35f && center_h_ratio < 0.45f) {
     return "crossed_circle";
   }
 
@@ -155,6 +158,51 @@ static std::string identify_cursor_by_image(XFixesCursorImage* img) {
   }
 
   return "left_ptr";
+}
+
+Napi::Value GetCursorDebug(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  auto result = Napi::Object::New(env);
+  if (!display) return result;
+
+  XFixesCursorImage* img = XFixesGetCursorImage(display);
+  if (!img) return result;
+
+  unsigned int w = img->width, h = img->height;
+  unsigned int hx = img->xhot, hy = img->yhot;
+  int total = 0, center_col = 0;
+  int min_x = w, max_x = 0, min_y = h, max_y = 0;
+  for (unsigned int y2 = 0; y2 < h; y2++) {
+    for (unsigned int x2 = 0; x2 < w; x2++) {
+      unsigned int alpha = (img->pixels[y2 * w + x2] >> 24) & 0xFF;
+      if (alpha > 128) {
+        total++;
+        if (x2 >= w/3 && x2 < w*2/3) center_col++;
+        if (x2 < (unsigned)min_x) min_x = x2;
+        if (x2 > (unsigned)max_x) max_x = x2;
+        if (y2 < (unsigned)min_y) min_y = y2;
+        if (y2 > (unsigned)max_y) max_y = y2;
+      }
+    }
+  }
+
+  std::string name = (img->name && strlen(img->name) > 0) ? img->name : "(empty)";
+  float fill = (float)total / (float)(w * h);
+  float chr = total > 0 ? (float)center_col / total : 0;
+  int fw = max_x - min_x + 1, fh = max_y - min_y + 1;
+  float fr = fh > 0 ? (float)fw / fh : 0;
+
+  result.Set("name", name);
+  result.Set("w", w); result.Set("h", h);
+  result.Set("hx", hx); result.Set("hy", hy);
+  result.Set("fill", fill);
+  result.Set("centerHR", chr);
+  result.Set("filledW", fw); result.Set("filledH", fh);
+  result.Set("filledRatio", fr);
+  result.Set("total", total);
+
+  XFree(img);
+  return result;
 }
 
 Napi::Value GetCursorState(const Napi::CallbackInfo& info) {
@@ -261,6 +309,7 @@ Napi::Object InitModule(Napi::Env env, Napi::Object exports) {
   exports.Set("isCursorHidden", Napi::Function::New(env, IsCursorHidden));
   exports.Set("setOverlayWindow", Napi::Function::New(env, SetOverlayWindow));
   exports.Set("raiseOverlay", Napi::Function::New(env, RaiseOverlay));
+  exports.Set("getCursorDebug", Napi::Function::New(env, GetCursorDebug));
   return exports;
 }
 

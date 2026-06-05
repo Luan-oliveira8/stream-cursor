@@ -18,6 +18,7 @@ export class CursorRenderer {
   private animationFrame = 0
   private rotationAngle = 0
   private prevRect = { x: 0, y: 0, w: 0, h: 0 }
+  private lastDrawnState = 'pointer'
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
@@ -76,8 +77,9 @@ export class CursorRenderer {
       const isAnimated = this.currentState === 'wait' || this.currentState === 'progress'
       const moved = this.currentPos.x !== this.lastDrawnPos.x ||
                     this.currentPos.y !== this.lastDrawnPos.y
+      const stateChanged = this.currentState !== this.lastDrawnState
 
-      if (!moved && !isAnimated) {
+      if (!moved && !isAnimated && !stateChanged) {
         this.animationFrame = requestAnimationFrame(render)
         return
       }
@@ -118,6 +120,7 @@ export class CursorRenderer {
 
       this.lastDrawnPos.x = this.currentPos.x
       this.lastDrawnPos.y = this.currentPos.y
+      this.lastDrawnState = this.currentState
       this.animationFrame = requestAnimationFrame(render)
     }
 
